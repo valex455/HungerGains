@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunger Gains - Compete or Die</title>
+    <title>Hunger Gains - Prove Fotografiche</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0a0a0a; color: #f0f0f0; font-family: 'Segoe UI', sans-serif; }
         .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; }
         .btn-action { background: linear-gradient(45deg, #ff4e50, #f9d423); color: black; font-weight: 900; transition: 0.2s; }
-        .btn-action:active { transform: scale(0.95); }
-        .history-card { background: #1a1a1a; border-left: 4px solid #ff4e50; margin-bottom: 8px; padding: 10px; border-radius: 8px; }
-        .rule-row { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
+        .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .history-card { background: #1a1a1a; border-left: 4px solid #ff4e50; margin-bottom: 8px; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; }
+        .thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body class="p-4 max-w-md mx-auto pb-20">
 
     <header class="text-center mb-6">
         <h1 class="text-4xl font-black italic tracking-tighter text-orange-500 uppercase">Hunger Gains</h1>
-        <p class="text-gray-500 text-[10px] font-mono uppercase tracking-[0.2em]">Season 2026 • Official Tracker</p>
+        <p class="text-[9px] font-mono text-gray-500 uppercase tracking-widest">Nessuna foto = Nessun punto</p>
     </header>
 
-    <div class="glass-card mb-6 text-center shadow-2xl">
+    <div class="glass-card mb-6 text-center">
         <span class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Punteggio Totale</span>
-        <h2 id="total-score" class="text-7xl font-black my-1 tracking-tighter text-white">0</h2>
-        <button onclick="shareWA()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full text-[10px] font-bold mt-2 uppercase">
-            📢 Condividi su WhatsApp
-        </button>
+        <h2 id="total-score" class="text-7xl font-black my-1 text-white italic">0</h2>
+        <button onclick="shareWA()" class="bg-green-600 text-white px-4 py-2 rounded-full text-[10px] font-bold mt-2 uppercase">📢 Invia a Gruppo WA</button>
     </div>
 
     <div class="glass-card mb-6">
         <h3 class="text-xs font-black text-orange-500 uppercase mb-4 tracking-wider italic">⚡ Registra Workout</h3>
-        <div class="space-y-3">
-            <select id="sport" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl outline-none focus:border-orange-500 text-sm" onchange="updateLabel()">
+        <div class="space-y-4">
+            <select id="sport" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl outline-none text-sm" onchange="updateLabel()">
                 <option value="corsa">🏃 Corsa</option>
                 <option value="arrampicata">🧗 Arrampicata</option>
                 <option value="calisthenics">🤸 Calisthenics</option>
@@ -40,70 +38,74 @@
                 <option value="nuoto">🏊 Nuoto</option>
             </select>
 
-            <div>
-                <label id="vol-label" class="text-[9px] font-black text-gray-500 uppercase ml-1">Kilometri percorsi</label>
-                <input type="number" id="volume" step="0.1" placeholder="0.0" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl outline-none focus:border-orange-500 text-xl font-bold">
+            <input type="number" id="volume" step="0.1" placeholder="Inserisci valore (km o ore)" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-xl font-bold">
+
+            <div class="relative">
+                <label class="flex items-center justify-center w-full p-4 border-2 border-dashed border-white/10 rounded-xl bg-white/5 cursor-pointer hover:bg-white/10 transition" id="drop-zone">
+                    <input type="file" id="photo-input" accept="image/*" capture="camera" class="hidden" onchange="handlePhoto(this)">
+                    <div id="photo-placeholder" class="text-center">
+                        <span class="text-2xl">📸</span>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase mt-1">Scatta o allega prova</p>
+                    </div>
+                    <img id="photo-preview" class="hidden w-full h-32 object-cover rounded-lg">
+                </label>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
-                <label class="flex flex-col items-center p-2 bg-white/5 rounded-xl border border-white/5 cursor-pointer has-[:checked]:border-orange-500 text-center">
+                <label class="flex items-center justify-center p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer has-[:checked]:border-orange-500">
                     <input type="checkbox" id="bonus-pr" class="hidden">
                     <span class="text-[9px] font-bold uppercase">🎯 Bonus PR</span>
                 </label>
-                <label class="flex flex-col items-center p-2 bg-white/5 rounded-xl border border-white/5 cursor-pointer has-[:checked]:border-orange-500 text-center">
+                <label class="flex items-center justify-center p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer has-[:checked]:border-orange-500">
                     <input type="checkbox" id="bonus-combo" class="hidden">
                     <span class="text-[9px] font-bold uppercase">🔥 Multi-Sport</span>
                 </label>
             </div>
 
-            <button onclick="addSession()" class="btn-action w-full py-4 rounded-xl uppercase font-black text-sm">
+            <button id="save-btn" onclick="addSession()" disabled class="btn-action w-full py-5 rounded-2xl uppercase font-black text-lg shadow-lg">
                 Salva Allenamento
             </button>
         </div>
     </div>
 
-    <div class="glass-card mb-6 bg-orange-500/5 border-orange-500/20">
-        <h3 class="text-xs font-black text-orange-500 uppercase mb-3 tracking-wider italic">📖 Regolamento Punti</h3>
-        <div class="text-[11px] space-y-1">
-            <div class="flex justify-between rule-row"><span class="text-gray-300">🏃 Corsa</span><b>2 pts / km</b></div>
-            <div class="flex justify-between rule-row"><span class="text-gray-300">🧗 Arrampicata</span><b>15 pts / ora</b></div>
-            <div class="flex justify-between rule-row"><span class="text-gray-300">🤸 Calisthenics</span><b>12 pts / ora</b></div>
-            <div class="flex justify-between rule-row"><span class="text-gray-300">🏋️ Pesi</span><b>10 pts / ora</b></div>
-            <div class="flex justify-between rule-row"><span class="text-gray-300">🏊 Nuoto</span><b>10 pts / km</b></div>
-            
-            <div class="mt-4 pt-2 border-t border-orange-500/20">
-                <h4 class="text-[10px] font-black text-orange-400 uppercase mb-2">Bonus Extra</h4>
-                <div class="flex justify-between text-[10px]"><span class="text-gray-400">🎯 PR / Intensità Massima</span><b>+10 pts</b></div>
-                <div class="flex justify-between text-[10px]"><span class="text-gray-400">🔥 2+ Sport nello stesso giorno</span><b>+15 pts</b></div>
-            </div>
-        </div>
+    <div class="glass-card mb-6 text-[10px] grid grid-cols-2 gap-2 opacity-70 italic">
+        <div>🏃 2 pts/km | 🏊 10 pts/km</div>
+        <div>🧗 15 pts/h | 🏋️ 10 pts/h</div>
     </div>
 
     <div>
-        <div class="flex justify-between items-end mb-3 px-1">
-            <h3 class="font-black italic uppercase text-[10px] text-gray-500 tracking-widest">Ultime Sessioni</h3>
-            <button onclick="clearData()" class="text-[8px] text-red-900 font-bold uppercase">Reset Dati</button>
-        </div>
+        <h3 class="font-black italic uppercase text-[10px] text-gray-500 mb-3 ml-1">Ultime Prove Caricate</h3>
         <div id="history-log" class="space-y-2"></div>
+        <button onclick="clearData()" class="w-full mt-4 text-[8px] text-red-900 font-bold uppercase tracking-[0.3em]">Reset Totale</button>
     </div>
 
     <script>
         let db = JSON.parse(localStorage.getItem('hg_db')) || { total: 0, logs: [] };
+        let currentPhoto = null;
 
-        function updateLabel() {
-            const s = document.getElementById('sport').value;
-            document.getElementById('vol-label').innerText = (s === 'corsa' || s === 'nuoto') ? "Kilometri percorsi" : "Ore effettive";
+        function handlePhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentPhoto = e.target.result;
+                    document.getElementById('photo-preview').src = currentPhoto;
+                    document.getElementById('photo-preview').classList.remove('hidden');
+                    document.getElementById('photo-placeholder').classList.add('hidden');
+                    document.getElementById('save-btn').disabled = false; // Sblocca il tasto
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function addSession() {
             const sport = document.getElementById('sport');
             const vol = parseFloat(document.getElementById('volume').value);
-            if(!vol || vol <= 0) return alert("Inserisci un valore!");
+            if(!vol || !currentPhoto) return alert("Inserisci dati e foto!");
 
             let base = 0;
             const type = sport.value;
-            const bonusPr = document.getElementById('bonus-pr').checked;
-            const bonusCo = document.getElementById('bonus-combo').checked;
+            const bPr = document.getElementById('bonus-pr').checked;
+            const bCo = document.getElementById('bonus-combo').checked;
 
             if(type === 'corsa') base = vol * 2;
             else if(type === 'arrampicata') base = vol * 15;
@@ -111,42 +113,52 @@
             else if(type === 'pesi') base = vol * 10;
             else if(type === 'nuoto') base = vol * 10;
 
-            let sessionPoints = base + (bonusPr ? 10 : 0) + (bonusCo ? 15 : 0);
+            let pts = base + (bPr ? 10 : 0) + (bCo ? 15 : 0);
             
-            db.total += sessionPoints;
+            db.total += pts;
             db.logs.unshift({
                 title: sport.options[sport.selectedIndex].text,
-                pts: sessionPoints.toFixed(1),
-                date: new Date().toLocaleDateString('it-IT', {day: '2-digit', month: 'short'})
+                pts: pts.toFixed(1),
+                date: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'short'}),
+                img: currentPhoto // Salva la miniatura
             });
 
             localStorage.setItem('hg_db', JSON.stringify(db));
+            resetForm();
             render();
+        }
+
+        function resetForm() {
             document.getElementById('volume').value = '';
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.getElementById('photo-placeholder').classList.remove('hidden');
+            document.getElementById('save-btn').disabled = true;
             document.getElementById('bonus-pr').checked = false;
             document.getElementById('bonus-combo').checked = false;
+            currentPhoto = null;
         }
 
         function render() {
             document.getElementById('total-score').innerText = Math.floor(db.total);
             document.getElementById('history-log').innerHTML = db.logs.slice(0, 5).map(l => `
-                <div class="history-card flex justify-between items-center">
-                    <div>
-                        <div class="font-black uppercase text-[11px] text-white">${l.title}</div>
-                        <div class="text-[9px] text-gray-600 font-mono italic">${l.date}</div>
+                <div class="history-card">
+                    <img src="${l.img}" class="thumb">
+                    <div class="flex-1">
+                        <div class="font-black uppercase text-[10px] text-white leading-none">${l.title}</div>
+                        <div class="text-[8px] text-gray-500 font-mono">${l.date}</div>
                     </div>
-                    <div class="text-lg font-black text-orange-500 tracking-tighter">+${l.pts}</div>
+                    <div class="text-lg font-black text-orange-500">+${l.pts}</div>
                 </div>
             `).join('');
         }
 
         function shareWA() {
-            const text = `🏆 *HUNGER GAINS 2026*%0AMio Punteggio: *${Math.floor(db.total)} pts*%0A💪 Chi osa sfidarmi?`;
+            const text = `🏆 *HUNGER GAINS*%0APunteggio: *${Math.floor(db.total)} pts*%0A📸 Prove caricate nell'app!`;
             window.open(`https://wa.me/?text=${text}`, '_blank');
         }
 
         function clearData() {
-            if(confirm("Vuoi azzerare i punti?")) {
+            if(confirm("Sei sicuro? Perderai tutti i punti e le foto!")) {
                 db = { total: 0, logs: [] };
                 localStorage.setItem('hg_db', JSON.stringify(db));
                 render();
