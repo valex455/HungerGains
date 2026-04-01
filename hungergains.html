@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunger Gains Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #121212; color: #e0e0e0; font-family: 'Inter', sans-serif; }
+        .card { background-color: #1e1e1e; border-radius: 20px; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid #333; }
+        input, select { background-color: #2a2a2a; border: 1px solid #444; color: white; padding: 12px; border-radius: 12px; width: 100%; margin-top: 8px; }
+        .btn-gradient { background: linear-gradient(135deg, #f2994a, #f2c94c); color: #000; font-weight: 800; transition: all 0.2s; }
+        .btn-gradient:active { transform: scale(0.98); opacity: 0.9; }
+        .history-item { border-left: 4px solid #f2994a; background: #252525; margin-bottom: 8px; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-4 pb-12">
+
+    <div class="max-w-md mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500 uppercase tracking-tighter italic">Hunger Gains</h1>
+            <p class="text-gray-500 text-xs font-bold tracking-widest mt-1">YEAR ONE - COMPETITION</p>
+        </header>
+
+        <div class="card mb-6 text-center border-orange-500/30">
+            <p class="text-gray-400 uppercase text-xs font-bold mb-1">Il Tuo Punteggio Totale</p>
+            <h2 id="punti-totali" class="text-7xl font-black text-white italic">0</h2>
+        </div>
+
+        <div class="card mb-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center text-orange-400">
+                <span class="mr-2">⚡</span> Nuova Sessione
+            </h3>
+            
+            <label class="text-xs font-bold text-gray-500 uppercase">Sport</label>
+            <select id="sport" onchange="updateUI()">
+                <option value="corsa">🏃 Corsa (2 pts/km)</option>
+                <option value="arrampicata">🧗 Arrampicata (15 pts/ora)</option>
+                <option value="calisthenics">🤸 Calisthenics (12 pts/ora)</option>
+                <option value="pesi">🏋️ Palestra (10 pts/ora)</option>
+                <option value="nuoto">🏊 Nuoto (10 pts/km)</option>
+            </select>
+
+            <div class="mt-4">
+                <label id="label-volume" class="text-xs font-bold text-gray-500 uppercase italic">Kilometri percorsi</label>
+                <input type="number" id="volume" placeholder="Inserisci valore..." step="0.1">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <div class="flex flex-col items-center p-3 rounded-xl bg-[#2a2a2a] border border-gray-700">
+                    <span class="text-xs font-bold mb-2">Bonus PR</span>
+                    <input type="checkbox" id="bonus-intensita" class="w-6 h-6 accent-orange-500">
+                </div>
+                <div class="flex flex-col items-center p-3 rounded-xl bg-[#2a2a2a] border border-gray-700">
+                    <span class="text-xs font-bold mb-2">Combo Day</span>
+                    <input type="checkbox" id="bonus-combo" class="w-6 h-6 accent-orange-500">
+                </div>
+            </div>
+
+            <button onclick="salvaSessione()" class="btn-gradient w-full mt-6 py-4 rounded-xl uppercase shadow-lg shadow-orange-900/20">
+                Registra Allenamento
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-300">Recenti</h3>
+                <button onclick="resetTotale()" class="text-[10px] text-red-500 font-bold border border-red-900/30 px-2 py-1 rounded">RESET ANNO</button>
+            </div>
+            <div id="lista-storico" class="text-sm">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let storageKey = "hungerGains_data";
+        let datiUtente = JSON.parse(localStorage.getItem(storageKey)) || { totale: 0, sessioni: [] };
+
+        // Inizializza al caricamento
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDati();
+            updateUI();
+        });
+
+        function updateUI() {
+            const sport = document.getElementById('sport').value;
+            const label = document.getElementById('label-volume');
+            label.innerText = (sport === 'corsa' || sport === 'nuoto') ? "Kilometri percorsi" : "Ore effettive";
+        }
+
+        function salvaSessione() {
+            const sportSelect = document.getElementById('sport');
+            const sportNome = sportSelect.options[sportSelect.selectedIndex].text.split('(')[0];
+            const sportVal = sportSelect.value;
+            const volume = parseFloat(document.getElementById('volume').value) || 0;
+            const bonusInt = document.getElementById('bonus-intensita').checked;
+            const bonusCom = document.getElementById('bonus-combo').checked;
+            
+            if(volume <= 0) return alert("Inserisci un valore valido!");
+
+            let puntiBase = 0;
+            let bValue = 0;
+
+            if(sportVal === 'corsa') { puntiBase = volume * 2; bValue = bonusInt ? 5 : 0; }
+            else if(sportVal === 'arrampicata') { puntiBase = volume * 15; bValue = bonusInt ? 10 : 0; }
+            else if(sportVal === 'calisthenics') { puntiBase = volume * 12; bValue = bonusInt ? 5 : 0; }
+            else if(sportVal === 'pesi') { puntiBase = volume * 10; bValue = bonusInt ? 5 : 0; }
+            else if(sportVal === 'nuoto') { puntiBase = volume * 10; bValue = bonusInt ? 5 : 0; }
+
+            let totaleSessione = puntiBase + bValue + (bonusCom ? 15 : 0);
+            
+            // Aggiorna Dati
+            datiUtente.totale += totaleSessione;
+            datiUtente.sessioni.unshift({
+                desc: `${sportNome}: ${volume}`,
+                punti: totaleSessione.toFixed(1),
+                data: new Date().toLocaleDateString('it-IT')
+            });
+
+            localStorage.setItem(storageKey, JSON.stringify(datiUtente));
+            
+            // Reset Campi
+            document.getElementById('volume').value = '';
+            document.getElementById('bonus-intensita').checked = false;
+            document.getElementById('bonus-combo').checked = false;
+
+            renderDati();
+        }
+
+        function renderDati() {
+            document.getElementById('punti-totali').innerText = Math.round(datiUtente.totale);
+            const lista = document.getElementById('lista-storico');
+            lista.innerHTML = datiUtente.sessioni.slice(0, 5).map(s => `
+                <div class="history-item flex justify-between items-center">
+                    <div>
+                        <p class="font-bold">${s.desc}</p>
+                        <p class="text-[10px] text-gray-500 uppercase">${s.data}</p>
+                    </div>
+                    <div class="font-black text-orange-400">+${s.punti}</div>
+                </div>
+            `).join('');
+        }
+
+        function resetTotale() {
+            if(confirm("Sei sicuro di voler cancellare TUTTI i punti?")) {
+                datiUtente = { totale: 0, sessioni: [] };
+                localStorage.setItem(storageKey, JSON.stringify(datiUtente));
+                renderDati();
+            }
+        }
+    </script>
+</body>
+</html>
