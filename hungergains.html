@@ -3,151 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hunger Gains Pro</title>
+    <title>Hunger Gains - Compete or Die</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: 'Inter', sans-serif; }
-        .card { background-color: #1e1e1e; border-radius: 20px; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid #333; }
-        input, select { background-color: #2a2a2a; border: 1px solid #444; color: white; padding: 12px; border-radius: 12px; width: 100%; margin-top: 8px; }
-        .btn-gradient { background: linear-gradient(135deg, #f2994a, #f2c94c); color: #000; font-weight: 800; transition: all 0.2s; }
-        .btn-gradient:active { transform: scale(0.98); opacity: 0.9; }
-        .history-item { border-left: 4px solid #f2994a; background: #252525; margin-bottom: 8px; padding: 10px; border-radius: 4px; }
+        body { background-color: #0a0a0a; color: #f0f0f0; font-family: 'Segoe UI', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); padding: 24px; }
+        .btn-action { background: linear-gradient(45deg, #ff4e50, #f9d423); color: black; font-weight: 900; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .btn-action:active { transform: scale(0.92); }
+        .history-card { background: #1a1a1a; border-left: 5px solid #ff4e50; margin-bottom: 10px; padding: 12px; border-radius: 8px; }
     </style>
 </head>
-<body class="p-4 pb-12">
+<body class="p-6 max-w-md mx-auto">
 
-    <div class="max-w-md mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500 uppercase tracking-tighter italic">Hunger Gains</h1>
-            <p class="text-gray-500 text-xs font-bold tracking-widest mt-1">YEAR ONE - COMPETITION</p>
-        </header>
+    <header class="text-center mb-8">
+        <h1 class="text-5xl font-black italic tracking-tighter text-orange-500 uppercase">Hunger Gains</h1>
+        <p id="date-display" class="text-gray-500 text-xs font-mono uppercase mt-2"></p>
+    </header>
 
-        <div class="card mb-6 text-center border-orange-500/30">
-            <p class="text-gray-400 uppercase text-xs font-bold mb-1">Il Tuo Punteggio Totale</p>
-            <h2 id="punti-totali" class="text-7xl font-black text-white italic">0</h2>
-        </div>
-
-        <div class="card mb-6">
-            <h3 class="text-lg font-bold mb-4 flex items-center text-orange-400">
-                <span class="mr-2">⚡</span> Nuova Sessione
-            </h3>
-            
-            <label class="text-xs font-bold text-gray-500 uppercase">Sport</label>
-            <select id="sport" onchange="updateUI()">
-                <option value="corsa">🏃 Corsa (2 pts/km)</option>
-                <option value="arrampicata">🧗 Arrampicata (15 pts/ora)</option>
-                <option value="calisthenics">🤸 Calisthenics (12 pts/ora)</option>
-                <option value="pesi">🏋️ Palestra (10 pts/ora)</option>
-                <option value="nuoto">🏊 Nuoto (10 pts/km)</option>
-            </select>
-
-            <div class="mt-4">
-                <label id="label-volume" class="text-xs font-bold text-gray-500 uppercase italic">Kilometri percorsi</label>
-                <input type="number" id="volume" placeholder="Inserisci valore..." step="0.1">
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 mt-6">
-                <div class="flex flex-col items-center p-3 rounded-xl bg-[#2a2a2a] border border-gray-700">
-                    <span class="text-xs font-bold mb-2">Bonus PR</span>
-                    <input type="checkbox" id="bonus-intensita" class="w-6 h-6 accent-orange-500">
-                </div>
-                <div class="flex flex-col items-center p-3 rounded-xl bg-[#2a2a2a] border border-gray-700">
-                    <span class="text-xs font-bold mb-2">Combo Day</span>
-                    <input type="checkbox" id="bonus-combo" class="w-6 h-6 accent-orange-500">
-                </div>
-            </div>
-
-            <button onclick="salvaSessione()" class="btn-gradient w-full mt-6 py-4 rounded-xl uppercase shadow-lg shadow-orange-900/20">
-                Registra Allenamento
+    <div class="glass-card mb-8 text-center shadow-2xl shadow-orange-900/20">
+        <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Punteggio Stagione 2026</span>
+        <h2 id="total-score" class="text-8xl font-black my-2 tracking-tighter">0</h2>
+        <div class="flex justify-center gap-2 mt-4">
+            <button onclick="shareWA()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center">
+                📢 CONDIVIDI SU WHATSAPP
             </button>
-        </div>
-
-        <div class="card">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-300">Recenti</h3>
-                <button onclick="resetTotale()" class="text-[10px] text-red-500 font-bold border border-red-900/30 px-2 py-1 rounded">RESET ANNO</button>
-            </div>
-            <div id="lista-storico" class="text-sm">
-                </div>
         </div>
     </div>
 
+    <div class="glass-card mb-8">
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] font-black text-gray-400 uppercase">Scegli Disciplina</label>
+                <select id="sport" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mt-1 outline-none focus:border-orange-500" onchange="updateLabel()">
+                    <option value="corsa">🏃 CORSA (2 pts/km)</option>
+                    <option value="arrampicata">🧗 ARRAMPICATA (15 pts/h)</option>
+                    <option value="calisthenics">🤸 CALISTHENICS (12 pts/h)</option>
+                    <option value="pesi">🏋️ PESI (10 pts/h)</option>
+                    <option value="nuoto">🏊 NUOTO (10 pts/km)</option>
+                </select>
+            </div>
+
+            <div>
+                <label id="vol-label" class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">Kilometri percorsi</label>
+                <input type="number" id="volume" step="0.1" placeholder="Inserisci valore..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mt-1 outline-none focus:border-orange-500 text-2xl font-bold">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pt-2">
+                <label class="flex items-center justify-center p-4 bg-white/5 rounded-xl border border-white/5 cursor-pointer has-[:checked]:border-orange-500">
+                    <input type="checkbox" id="bonus-pr" class="hidden">
+                    <span class="text-[10px] font-bold">🎯 BONUS PR/INTENSITÀ</span>
+                </label>
+                <label class="flex items-center justify-center p-4 bg-white/5 rounded-xl border border-white/5 cursor-pointer has-[:checked]:border-orange-500">
+                    <input type="checkbox" id="bonus-combo" class="hidden">
+                    <span class="text-[10px] font-bold">🔥 MULTI-SPORT DAY</span>
+                </label>
+            </div>
+
+            <button onclick="addSession()" class="btn-action w-full py-5 rounded-2xl uppercase tracking-tighter text-xl">
+                Registra Workout
+            </button>
+        </div>
+    </div>
+
+    <div>
+        <div class="flex justify-between items-end mb-4 px-2">
+            <h3 class="font-black italic uppercase text-gray-400">Ultime Sessioni</h3>
+            <button onclick="clearData()" class="text-[9px] text-red-800 font-bold uppercase hover:text-red-500">Reset Dati</button>
+        </div>
+        <div id="history-log" class="space-y-3"></div>
+    </div>
+
     <script>
-        let storageKey = "hungerGains_data";
-        let datiUtente = JSON.parse(localStorage.getItem(storageKey)) || { totale: 0, sessioni: [] };
+        let db = JSON.parse(localStorage.getItem('hg_db')) || { total: 0, logs: [] };
 
-        // Inizializza al caricamento
-        document.addEventListener('DOMContentLoaded', () => {
-            renderDati();
-            updateUI();
-        });
-
-        function updateUI() {
-            const sport = document.getElementById('sport').value;
-            const label = document.getElementById('label-volume');
-            label.innerText = (sport === 'corsa' || sport === 'nuoto') ? "Kilometri percorsi" : "Ore effettive";
+        function updateLabel() {
+            const s = document.getElementById('sport').value;
+            document.getElementById('vol-label').innerText = (s === 'corsa' || s === 'nuoto') ? "Kilometri percorsi" : "Ore effettive";
         }
 
-        function salvaSessione() {
-            const sportSelect = document.getElementById('sport');
-            const sportNome = sportSelect.options[sportSelect.selectedIndex].text.split('(')[0];
-            const sportVal = sportSelect.value;
-            const volume = parseFloat(document.getElementById('volume').value) || 0;
-            const bonusInt = document.getElementById('bonus-intensita').checked;
-            const bonusCom = document.getElementById('bonus-combo').checked;
+        function addSession() {
+            const sport = document.getElementById('sport');
+            const vol = parseFloat(document.getElementById('volume').value);
+            if(!vol || vol <= 0) return alert("Inserisci un volume valido!");
+
+            let base = 0;
+            const type = sport.value;
+            const bonusPr = document.getElementById('bonus-pr').checked;
+            const bonusCo = document.getElementById('bonus-combo').checked;
+
+            if(type === 'corsa') base = vol * 2;
+            else if(type === 'arrampicata') base = vol * 15;
+            else if(type === 'calisthenics') base = vol * 12;
+            else if(type === 'pesi') base = vol * 10;
+            else if(type === 'nuoto') base = vol * 10;
+
+            let sessionPoints = base + (bonusPr ? 10 : 0) + (bonusCo ? 15 : 0);
             
-            if(volume <= 0) return alert("Inserisci un valore valido!");
-
-            let puntiBase = 0;
-            let bValue = 0;
-
-            if(sportVal === 'corsa') { puntiBase = volume * 2; bValue = bonusInt ? 5 : 0; }
-            else if(sportVal === 'arrampicata') { puntiBase = volume * 15; bValue = bonusInt ? 10 : 0; }
-            else if(sportVal === 'calisthenics') { puntiBase = volume * 12; bValue = bonusInt ? 5 : 0; }
-            else if(sportVal === 'pesi') { puntiBase = volume * 10; bValue = bonusInt ? 5 : 0; }
-            else if(sportVal === 'nuoto') { puntiBase = volume * 10; bValue = bonusInt ? 5 : 0; }
-
-            let totaleSessione = puntiBase + bValue + (bonusCom ? 15 : 0);
-            
-            // Aggiorna Dati
-            datiUtente.totale += totaleSessione;
-            datiUtente.sessioni.unshift({
-                desc: `${sportNome}: ${volume}`,
-                punti: totaleSessione.toFixed(1),
-                data: new Date().toLocaleDateString('it-IT')
+            db.total += sessionPoints;
+            db.logs.unshift({
+                title: sport.options[sport.selectedIndex].text.split('(')[0],
+                pts: sessionPoints.toFixed(1),
+                date: new Date().toLocaleDateString('it-IT', {day: '2-digit', month: 'short'})
             });
 
-            localStorage.setItem(storageKey, JSON.stringify(datiUtente));
-            
-            // Reset Campi
+            localStorage.setItem('hg_db', JSON.stringify(db));
+            render();
             document.getElementById('volume').value = '';
-            document.getElementById('bonus-intensita').checked = false;
-            document.getElementById('bonus-combo').checked = false;
-
-            renderDati();
         }
 
-        function renderDati() {
-            document.getElementById('punti-totali').innerText = Math.round(datiUtente.totale);
-            const lista = document.getElementById('lista-storico');
-            lista.innerHTML = datiUtente.sessioni.slice(0, 5).map(s => `
-                <div class="history-item flex justify-between items-center">
+        function render() {
+            document.getElementById('total-score').innerText = Math.floor(db.total);
+            document.getElementById('history-log').innerHTML = db.logs.slice(0, 8).map(l => `
+                <div class="history-card flex justify-between items-center">
                     <div>
-                        <p class="font-bold">${s.desc}</p>
-                        <p class="text-[10px] text-gray-500 uppercase">${s.data}</p>
+                        <div class="font-black uppercase text-sm">${l.title}</div>
+                        <div class="text-[10px] text-gray-500 font-mono">${l.date}</div>
                     </div>
-                    <div class="font-black text-orange-400">+${s.punti}</div>
+                    <div class="text-xl font-black text-orange-500">+${l.pts}</div>
                 </div>
             `).join('');
         }
 
-        function resetTotale() {
-            if(confirm("Sei sicuro di voler cancellare TUTTI i punti?")) {
-                datiUtente = { totale: 0, sessioni: [] };
-                localStorage.setItem(storageKey, JSON.stringify(datiUtente));
-                renderDati();
+        function shareWA() {
+            const text = `🏆 *HUNGER GAINS 2026* %0AMio Punteggio Attuale: *${Math.floor(db.total)} punti*%0A🔥 Chi osa superarmi?`;
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        }
+
+        function clearData() {
+            if(confirm("Vuoi azzerare i tuoi punti?")) {
+                db = { total: 0, logs: [] };
+                localStorage.setItem('hg_db', JSON.stringify(db));
+                render();
             }
         }
+
+        document.getElementById('date-display').innerText = new Date().toDateString();
+        render();
     </script>
 </body>
 </html>
